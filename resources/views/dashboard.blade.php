@@ -9,72 +9,75 @@
     <div class="p-4 lg:p-6">
         {{-- Statistics Block Formation - Using flex for proper alignment --}}
         <div class="flex flex-col lg:flex-row gap-4 mb-6">
-            {{-- Total Registered Block - 25% width on desktop, contains 4 sub-blocks --}}
+            {{-- Total Registered Block - 25% width on desktop, contains sub-blocks --}}
             <div class="w-full lg:w-1/4 card bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-sm">
-                <div class="card-body p-3">
+                <div class="card-body p-2">
                     {{-- Year indicator --}}
-                    <div class="text-center mb-2">
-                        <span class="badge badge-primary badge-sm">{{ $currentYear }}</span>
+                    <div class="text-center mb-1">
+                        <span class="badge badge-primary badge-xs">{{ $currentYear }}</span>
                     </div>
                     
-                    {{-- 2x2 Grid inside --}}
-                    <div class="grid grid-cols-2 gap-2">
-                        {{-- Top Left: Total Registered Fisherfolk --}}
-                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
-                            <div class="bg-primary/20 rounded-lg p-2 inline-flex mb-2">
-                                <span class="icon-[tabler--users-group] size-5 text-primary"></span>
+                    {{-- Row 1: Total Registered (left) + New Registration & Renewal stacked (right) --}}
+                    <div class="flex gap-0 items-center mb-1">
+                        {{-- Left: Total Registered Fisherfolk - takes full height --}}
+                        <div class="bg-base-100/50 rounded-lg p-2 text-center flex-1 flex flex-col justify-center" style="border-right: 1px solid rgba(255,255,255,0.2);">
+                            <div class="bg-primary/20 rounded-lg p-1 inline-flex mb-1 mx-auto">
+                                <span class="icon-[tabler--users-group] size-4 text-primary"></span>
                             </div>
-                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">Total Registered</p>
-                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['total']['count']) }}</h3>
+                            <p class="text-[8px] text-base-content/60 uppercase tracking-wide leading-tight mb-0">Total Registered</p>
+                            <h3 class="font-bold text-base-content" style="font-size: 4rem; line-height: 1;">{{ number_format($registrationStats['total']['count']) }}</h3>
                             @if($registrationStats['total']['change']['direction'] === 'up')
-                                <span class="text-[10px] text-success">+{{ $registrationStats['total']['change']['value'] }}%</span>
+                                <span class="text-[8px] text-success">+{{ $registrationStats['total']['change']['value'] }}%</span>
                             @elseif($registrationStats['total']['change']['direction'] === 'down')
-                                <span class="text-[10px] text-error">-{{ $registrationStats['total']['change']['value'] }}%</span>
+                                <span class="text-[8px] text-error">-{{ $registrationStats['total']['change']['value'] }}%</span>
                             @else
-                                <span class="text-[10px] text-base-content/40">0%</span>
+                                <span class="text-[8px] text-base-content/40">0%</span>
                             @endif
                         </div>
 
-                        {{-- Top Right: New Registration --}}
-                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
-                            <div class="bg-success/20 rounded-lg p-2 inline-flex mb-2">
-                                <span class="icon-[tabler--user-plus] size-5 text-success"></span>
+                        {{-- Right: New Registration & Renewal stacked --}}
+                        <div class="flex flex-col gap-1 flex-1">
+                            {{-- New Registration --}}
+                            <div class="bg-base-100/50 rounded-lg p-1.5 text-center flex-1">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <div class="bg-success/20 rounded-lg p-1">
+                                        <span class="icon-[tabler--user-plus] size-3 text-success"></span>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-[8px] text-base-content/60 uppercase leading-tight">New</p>
+                                        <h3 class="text-base font-bold text-base-content leading-none">{{ number_format($registrationStats['new']['count']) }}</h3>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">New Registration</p>
-                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['new']['count']) }}</h3>
-                            @if($registrationStats['new']['change']['direction'] === 'up')
-                                <span class="text-[10px] text-success">+{{ $registrationStats['new']['change']['value'] }}%</span>
-                            @elseif($registrationStats['new']['change']['direction'] === 'down')
-                                <span class="text-[10px] text-error">-{{ $registrationStats['new']['change']['value'] }}%</span>
-                            @else
-                                <span class="text-[10px] text-base-content/40">0%</span>
-                            @endif
-                        </div>
 
-                        {{-- Bottom Left: Renewal --}}
-                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
-                            <div class="bg-info/20 rounded-lg p-2 inline-flex mb-2">
-                                <span class="icon-[tabler--refresh] size-5 text-info"></span>
+                            {{-- Renewal --}}
+                            <div class="bg-base-100/50 rounded-lg p-1.5 text-center flex-1">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <div class="bg-info/20 rounded-lg p-1">
+                                        <span class="icon-[tabler--refresh] size-3 text-info"></span>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-[8px] text-base-content/60 uppercase leading-tight">Renewal</p>
+                                        <h3 class="text-base font-bold text-base-content leading-none">{{ number_format($registrationStats['renewed']['count']) }}</h3>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">Renewal</p>
-                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['renewed']['count']) }}</h3>
-                            @if($registrationStats['renewed']['change']['direction'] === 'up')
-                                <span class="text-[10px] text-success">+{{ $registrationStats['renewed']['change']['value'] }}%</span>
-                            @elseif($registrationStats['renewed']['change']['direction'] === 'down')
-                                <span class="text-[10px] text-error">-{{ $registrationStats['renewed']['change']['value'] }}%</span>
-                            @else
-                                <span class="text-[10px] text-base-content/40">0%</span>
-                            @endif
                         </div>
+                    </div>
 
-                        {{-- Bottom Right: Inactive --}}
-                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
-                            <div class="bg-warning/20 rounded-lg p-2 inline-flex mb-2">
-                                <span class="icon-[tabler--user-off] size-5 text-warning"></span>
+                    {{-- Divider line --}}
+                    <div class="border-t border-base-content/10"></div>
+
+                    {{-- Row 2: Inactive - spans full width --}}
+                    <div class="bg-base-100/50 rounded-lg p-1.5 text-center mt-1">
+                        <div class="flex items-center justify-center gap-2">
+                            <div class="bg-warning/20 rounded-lg p-1">
+                                <span class="icon-[tabler--user-off] size-3 text-warning"></span>
                             </div>
-                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">Inactive</p>
-                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['inactive']['count']) }}</h3>
-                            <span class="text-[10px] text-base-content/40">Not renewed</span>
+                            <div class="text-left">
+                                <p class="text-[8px] text-base-content/60 uppercase leading-tight">Inactive</p>
+                                <h3 class="text-base font-bold text-base-content leading-none">{{ number_format($registrationStats['inactive']['count']) }}</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
