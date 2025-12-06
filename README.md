@@ -39,7 +39,11 @@ A comprehensive data visualization and management system for tracking fisherfolk
 
 ### Step 1: Configure Database
 
-Edit `.env` file and update these lines:
+**⚠️ Important:** This project is configured for **production by default** (perfect for cPanel shared hosting).
+
+**Default Configuration (Production - MySQL):**
+
+The `.env` file is already set to MySQL. Just update your credentials:
 
 ```env
 DB_CONNECTION=mysql
@@ -50,22 +54,27 @@ DB_USERNAME=your_mysql_username
 DB_PASSWORD=your_mysql_password
 ```
 
-### Step 2: Create MySQL Database
+**For Local Development (SQLite):**
+
+Use the development server command (see Step 3) - it automatically switches to SQLite:
 
 ```bash
-mysql -u root -p
+php artisan serve:dev
 ```
 
-```sql
-CREATE DATABASE fmo_fisherfolk_management_system;
-EXIT;
-```
+📖 **See [PRODUCTION_SETUP.md](PRODUCTION_SETUP.md) for complete MySQL setup guide**
 
-### Step 3: Run Migrations & Seeders
+### Step 2: Run Migrations & Seeders
+
+**For Production (MySQL):**
 
 ```bash
 php artisan migrate:fresh --seed
 ```
+
+**For Development (SQLite):**
+
+No need to run migrations manually - the `serve:dev` command handles the SQLite database automatically.
 
 This creates:
 - ✅ Database tables (users, fisherfolk, permissions)
@@ -75,10 +84,29 @@ This creates:
 - ✅ Sample fisherfolk records
 - ✅ Permission matrix for all users
 
-### Step 4: Start the Application
+### Step 3: Start the Application
+
+**For Local Development (SQLite - Recommended):**
+
+```bash
+php artisan serve:dev
+```
+
+This automatically:
+- ✅ Switches to SQLite database (no MySQL needed)
+- ✅ Loads `.env.development` settings
+- ✅ Sets debug mode and local environment
+- ✅ Restores production config when stopped
+
+**For Production Testing (MySQL):**
 
 ```bash
 php artisan serve
+```
+
+**Custom host/port:**
+```bash
+php artisan serve:dev --host=0.0.0.0 --port=8080
 ```
 
 Visit: **http://localhost:8000**

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FisherfolkController;
+use App\Http\Controllers\Api\StatsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -43,6 +44,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/fisherfolk/{id}', [FisherfolkController::class, 'destroy'])
         ->middleware('permission:fisherfolk.delete')
         ->name('fisherfolk.destroy');
+});
+
+// Statistics API endpoints for charts (web middleware for session auth)
+Route::middleware(['auth', 'verified', 'permission:dashboard.view'])->prefix('api/stats')->group(function () {
+    Route::get('/summary', [StatsController::class, 'summary']);
+    Route::get('/barangay', [StatsController::class, 'barangay']);
+    Route::get('/gender', [StatsController::class, 'gender']);
+    Route::get('/age-group', [StatsController::class, 'ageGroup']);
+    Route::get('/category', [StatsController::class, 'category']);
+    Route::get('/barangay-category', [StatsController::class, 'barangayCategory']);
 });
 
 // Profile routes

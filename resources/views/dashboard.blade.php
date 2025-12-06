@@ -1,149 +1,383 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Fisherfolk Management Dashboard') }}
-        </h2>
+        <div class="flex items-center gap-2">
+            <span class="icon-[tabler--layout-dashboard] size-5 text-primary"></span>
+            <h2 class="font-semibold text-xl text-base-content">Dashboard</h2>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Summary Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Total Fisherfolk Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-primary hover:shadow-lg transition">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Fisherfolk</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ number_format($totalFisherfolk) }}</p>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 rounded-full p-3">
-                            <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                        </div>
+    <div class="p-4 lg:p-6">
+        {{-- Statistics Block Formation - Using flex for proper alignment --}}
+        <div class="flex flex-col lg:flex-row gap-4 mb-6">
+            {{-- Total Registered Block - 25% width on desktop, contains 4 sub-blocks --}}
+            <div class="w-full lg:w-1/4 card bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-sm">
+                <div class="card-body p-3">
+                    {{-- Year indicator --}}
+                    <div class="text-center mb-2">
+                        <span class="badge badge-primary badge-sm">{{ $currentYear }}</span>
                     </div>
-                </div>
+                    
+                    {{-- 2x2 Grid inside --}}
+                    <div class="grid grid-cols-2 gap-2">
+                        {{-- Top Left: Total Registered Fisherfolk --}}
+                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
+                            <div class="bg-primary/20 rounded-lg p-2 inline-flex mb-2">
+                                <span class="icon-[tabler--users-group] size-5 text-primary"></span>
+                            </div>
+                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">Total Registered</p>
+                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['total']['count']) }}</h3>
+                            @if($registrationStats['total']['change']['direction'] === 'up')
+                                <span class="text-[10px] text-success">+{{ $registrationStats['total']['change']['value'] }}%</span>
+                            @elseif($registrationStats['total']['change']['direction'] === 'down')
+                                <span class="text-[10px] text-error">-{{ $registrationStats['total']['change']['value'] }}%</span>
+                            @else
+                                <span class="text-[10px] text-base-content/40">0%</span>
+                            @endif
+                        </div>
 
-                <!-- Male Count Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-ocean-blue hover:shadow-lg transition">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Male</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ number_format($maleCount) }}</p>
+                        {{-- Top Right: New Registration --}}
+                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
+                            <div class="bg-success/20 rounded-lg p-2 inline-flex mb-2">
+                                <span class="icon-[tabler--user-plus] size-5 text-success"></span>
+                            </div>
+                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">New Registration</p>
+                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['new']['count']) }}</h3>
+                            @if($registrationStats['new']['change']['direction'] === 'up')
+                                <span class="text-[10px] text-success">+{{ $registrationStats['new']['change']['value'] }}%</span>
+                            @elseif($registrationStats['new']['change']['direction'] === 'down')
+                                <span class="text-[10px] text-error">-{{ $registrationStats['new']['change']['value'] }}%</span>
+                            @else
+                                <span class="text-[10px] text-base-content/40">0%</span>
+                            @endif
                         </div>
-                        <div class="bg-ocean-blue bg-opacity-10 rounded-full p-3">
-                            <svg class="w-8 h-8 text-ocean-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Female Count Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-secondary hover:shadow-lg transition">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Female</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ number_format($femaleCount) }}</p>
+                        {{-- Bottom Left: Renewal --}}
+                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
+                            <div class="bg-info/20 rounded-lg p-2 inline-flex mb-2">
+                                <span class="icon-[tabler--refresh] size-5 text-info"></span>
+                            </div>
+                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">Renewal</p>
+                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['renewed']['count']) }}</h3>
+                            @if($registrationStats['renewed']['change']['direction'] === 'up')
+                                <span class="text-[10px] text-success">+{{ $registrationStats['renewed']['change']['value'] }}%</span>
+                            @elseif($registrationStats['renewed']['change']['direction'] === 'down')
+                                <span class="text-[10px] text-error">-{{ $registrationStats['renewed']['change']['value'] }}%</span>
+                            @else
+                                <span class="text-[10px] text-base-content/40">0%</span>
+                            @endif
                         </div>
-                        <div class="bg-secondary bg-opacity-10 rounded-full p-3">
-                            <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Barangays Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-sunset-orange hover:shadow-lg transition">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Barangays</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $distinctBarangays }}</p>
+                        {{-- Bottom Right: Inactive --}}
+                        <div class="bg-base-100/50 rounded-lg p-3 text-center">
+                            <div class="bg-warning/20 rounded-lg p-2 inline-flex mb-2">
+                                <span class="icon-[tabler--user-off] size-5 text-warning"></span>
+                            </div>
+                            <p class="text-[10px] text-base-content/60 uppercase tracking-wide leading-tight mb-1">Inactive</p>
+                            <h3 class="text-xl font-bold text-base-content">{{ number_format($registrationStats['inactive']['count']) }}</h3>
+                            <span class="text-[10px] text-base-content/40">Not renewed</span>
                         </div>
-                        <div class="bg-sunset-orange bg-opacity-10 rounded-full p-3">
-                            <svg class="w-8 h-8 text-sunset-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <!-- Barangay Distribution Chart -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <div style="height: 400px;">
-                        <canvas id="barangayChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Gender Distribution Chart -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <div style="height: 400px;">
-                        <canvas id="genderChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Additional Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <!-- Age Group Distribution Chart -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <div style="height: 400px;">
-                        <canvas id="ageGroupChart"></canvas>
+            {{-- Activity Categories Grid - 75% width on desktop, 2 rows x 3 cols --}}
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 content-start">
+                {{-- Row 1: Capture Fishing, Fish Vending, Boat Owner/Operator --}}
+                {{-- Capture Fishing --}}
+                <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="card-body p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-info/10 rounded-lg p-2 shrink-0">
+                                <span class="icon-[tabler--fish] size-5 text-info"></span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-base-content/60">Capture Fishing</p>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-bold text-base-content">{{ number_format($activityStats['capture_fishing']['count']) }}</h3>
+                                    @if($activityStats['capture_fishing']['change']['direction'] === 'up')
+                                        <span class="text-xs text-success font-medium">+{{ $activityStats['capture_fishing']['change']['value'] }}%</span>
+                                    @elseif($activityStats['capture_fishing']['change']['direction'] === 'down')
+                                        <span class="text-xs text-error font-medium">-{{ $activityStats['capture_fishing']['change']['value'] }}%</span>
+                                    @else
+                                        <span class="text-xs text-base-content/40">0%</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Activity Categories Chart -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <div style="height: 400px;">
-                        <canvas id="categoryChart"></canvas>
+                {{-- Fish Vending --}}
+                <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="card-body p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-error/10 rounded-lg p-2 shrink-0">
+                                <span class="icon-[tabler--shopping-cart] size-5 text-error"></span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-base-content/60">Fish Vending</p>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-bold text-base-content">{{ number_format($activityStats['vendor']['count']) }}</h3>
+                                    @if($activityStats['vendor']['change']['direction'] === 'up')
+                                        <span class="text-xs text-success font-medium">+{{ $activityStats['vendor']['change']['value'] }}%</span>
+                                    @elseif($activityStats['vendor']['change']['direction'] === 'down')
+                                        <span class="text-xs text-error font-medium">-{{ $activityStats['vendor']['change']['value'] }}%</span>
+                                    @else
+                                        <span class="text-xs text-base-content/40">0%</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Boat Owner/Operator --}}
+                <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="card-body p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-primary/10 rounded-lg p-2 shrink-0">
+                                <span class="icon-[tabler--sailboat] size-5 text-primary"></span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-base-content/60">Boat Owner/Operator</p>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-bold text-base-content">{{ number_format($activityStats['boat_owner']['count']) }}</h3>
+                                    @if($activityStats['boat_owner']['change']['direction'] === 'up')
+                                        <span class="text-xs text-success font-medium">+{{ $activityStats['boat_owner']['change']['value'] }}%</span>
+                                    @elseif($activityStats['boat_owner']['change']['direction'] === 'down')
+                                        <span class="text-xs text-error font-medium">-{{ $activityStats['boat_owner']['change']['value'] }}%</span>
+                                    @else
+                                        <span class="text-xs text-base-content/40">0%</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Row 2: Gleaning, Aquaculture, Fish Processing --}}
+                {{-- Gleaning --}}
+                <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="card-body p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-success/10 rounded-lg p-2 shrink-0">
+                                <span class="icon-[tabler--basket] size-5 text-success"></span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-base-content/60">Gleaning</p>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-bold text-base-content">{{ number_format($activityStats['gleaning']['count']) }}</h3>
+                                    @if($activityStats['gleaning']['change']['direction'] === 'up')
+                                        <span class="text-xs text-success font-medium">+{{ $activityStats['gleaning']['change']['value'] }}%</span>
+                                    @elseif($activityStats['gleaning']['change']['direction'] === 'down')
+                                        <span class="text-xs text-error font-medium">-{{ $activityStats['gleaning']['change']['value'] }}%</span>
+                                    @else
+                                        <span class="text-xs text-base-content/40">0%</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Aquaculture --}}
+                <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="card-body p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-secondary/10 rounded-lg p-2 shrink-0">
+                                <span class="icon-[tabler--ripple] size-5 text-secondary"></span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-base-content/60">Aquaculture</p>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-bold text-base-content">{{ number_format($activityStats['aquaculture']['count']) }}</h3>
+                                    @if($activityStats['aquaculture']['change']['direction'] === 'up')
+                                        <span class="text-xs text-success font-medium">+{{ $activityStats['aquaculture']['change']['value'] }}%</span>
+                                    @elseif($activityStats['aquaculture']['change']['direction'] === 'down')
+                                        <span class="text-xs text-error font-medium">-{{ $activityStats['aquaculture']['change']['value'] }}%</span>
+                                    @else
+                                        <span class="text-xs text-base-content/40">0%</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Fish Processing --}}
+                <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="card-body p-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-warning/10 rounded-lg p-2 shrink-0">
+                                <span class="icon-[tabler--tools-kitchen-2] size-5 text-warning"></span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-base-content/60">Fish Processing</p>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-bold text-base-content">{{ number_format($activityStats['fish_processing']['count']) }}</h3>
+                                    @if($activityStats['fish_processing']['change']['direction'] === 'up')
+                                        <span class="text-xs text-success font-medium">+{{ $activityStats['fish_processing']['change']['value'] }}%</span>
+                                    @elseif($activityStats['fish_processing']['change']['direction'] === 'down')
+                                        <span class="text-xs text-error font-medium">-{{ $activityStats['fish_processing']['change']['value'] }}%</span>
+                                    @else
+                                        <span class="text-xs text-base-content/40">0%</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Recent Fisherfolk Table -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recently Registered Fisherfolk</h3>
+        {{-- Charts Row 1 --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6">
+            {{-- Barangay Distribution Chart - Wider --}}
+            <div class="card bg-base-100 shadow-sm lg:col-span-2">
+                <div class="card-body p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-base-content">Fisherfolk by Barangay</h3>
+                        <div class="dropdown dropdown-end">
+                            <button class="btn btn-ghost btn-xs btn-square">
+                                <span class="icon-[tabler--dots-vertical] size-4"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="barangayChart"></div>
+                </div>
+            </div>
+
+            {{-- Gender Distribution Chart --}}
+            <div class="card bg-base-100 shadow-sm">
+                <div class="card-body p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-base-content">Gender Distribution</h3>
+                        <div class="dropdown dropdown-end">
+                            <button class="btn btn-ghost btn-xs btn-square">
+                                <span class="icon-[tabler--dots-vertical] size-4"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="genderChart"></div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Charts Row 2 --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6">
+            {{-- Age Group Distribution Chart --}}
+            <div class="card bg-base-100 shadow-sm">
+                <div class="card-body p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-base-content">Age Group Distribution</h3>
+                        <span class="badge badge-soft badge-primary badge-sm">Demographics</span>
+                    </div>
+                    <div id="ageGroupChart"></div>
+                </div>
+            </div>
+
+            {{-- Activity Categories Chart --}}
+            <div class="card bg-base-100 shadow-sm">
+                <div class="card-body p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-base-content">Activity Categories</h3>
+                        <span class="badge badge-soft badge-secondary badge-sm">Livelihood</span>
+                    </div>
+                    <div id="categoryChart"></div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Recent Fisherfolk Table --}}
+        <div class="card bg-base-100 shadow-sm">
+            <div class="card-body p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div>
+                        <h3 class="font-semibold text-base-content">Recently Registered</h3>
+                        <p class="text-sm text-base-content/60">Latest fisherfolk registrations</p>
+                    </div>
+                    @if(auth()->user()->hasPermission('fisherfolk', 'view'))
+                    <a href="{{ route('fisherfolk.index') }}" class="btn btn-primary btn-sm gap-2">
+                        <span class="icon-[tabler--eye] size-4"></span>
+                        View All
+                    </a>
+                    @endif
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
+                    <table class="table table-zebra">
+                        <thead>
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID Number</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Full Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Barangay</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sex</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date Registered</th>
+                                <th>
+                                    <div class="flex items-center gap-2">
+                                        <span class="icon-[tabler--id] size-4 text-base-content/50"></span>
+                                        ID Number
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex items-center gap-2">
+                                        <span class="icon-[tabler--user] size-4 text-base-content/50"></span>
+                                        Full Name
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex items-center gap-2">
+                                        <span class="icon-[tabler--map-pin] size-4 text-base-content/50"></span>
+                                        Barangay
+                                    </div>
+                                </th>
+                                <th>Sex</th>
+                                <th>
+                                    <div class="flex items-center gap-2">
+                                        <span class="icon-[tabler--calendar] size-4 text-base-content/50"></span>
+                                        Date Registered
+                                    </div>
+                                </th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody>
                             @forelse($recentFisherfolk as $person)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $person->id_number }}
+                            <tr class="hover">
+                                <td>
+                                    <span class="font-mono text-sm font-medium">{{ $person->id_number }}</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $person->full_name }}
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="avatar avatar-placeholder">
+                                            <div class="bg-base-300 text-base-content w-8 rounded-full">
+                                                <span class="text-xs">{{ substr($person->first_name, 0, 1) }}{{ substr($person->last_name, 0, 1) }}</span>
+                                            </div>
+                                        </div>
+                                        <span>{{ $person->full_name }}</span>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $person->address }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $person->sex == 'Male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800' }}">
+                                <td class="text-base-content/70">{{ $person->address }}</td>
+                                <td>
+                                    <span class="badge badge-sm {{ $person->sex == 'Male' ? 'badge-info badge-soft' : 'badge-secondary badge-soft' }}">
                                         {{ $person->sex }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $person->date_registered->format('M d, Y') }}
+                                <td class="text-base-content/60 text-sm">{{ $person->date_registered->format('M d, Y') }}</td>
+                                <td>
+                                    @if(auth()->user()->hasPermission('fisherfolk', 'view'))
+                                    <a href="{{ route('fisherfolk.show', $person) }}" class="btn btn-ghost btn-xs btn-square" title="View">
+                                        <span class="icon-[tabler--eye] size-4"></span>
+                                    </a>
+                                    @endif
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    No fisherfolk registered yet.
+                                <td colspan="6" class="text-center py-8">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <span class="icon-[tabler--users-minus] size-12 text-base-content/30"></span>
+                                        <p class="text-base-content/60">No fisherfolk registered yet</p>
+                                        @if(auth()->user()->hasPermission('fisherfolk', 'create'))
+                                        <a href="{{ route('fisherfolk.create') }}" class="btn btn-primary btn-sm mt-2">
+                                            Register First Fisherfolk
+                                        </a>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                             @endforelse
@@ -155,6 +389,11 @@
     </div>
 
     @push('scripts')
-    @vite('resources/js/charts.js')
+    <script>
+        // Initialize charts when page loads
+        if (typeof window.initDashboardCharts === 'function') {
+            window.initDashboardCharts();
+        }
+    </script>
     @endpush
 </x-app-layout>

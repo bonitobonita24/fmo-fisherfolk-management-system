@@ -1,3 +1,125 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "flyonui";
+@plugin "@iconify/tailwind4";
+@import "flyonui/variants.css";
+@import "flyonui/src/vendor/apexcharts.css";
+@source "../../node_modules/flyonui/flyonui.js";
+
+/* Custom theme colors - Matte Tangerine Orange & Matte Blue */
+@theme {
+    /* Matte Blue - Primary */
+    --color-matte-blue: #3D5A80;
+    --color-matte-blue-light: #5B7BA3;
+    --color-matte-blue-dark: #2C4563;
+    
+    /* Matte Tangerine Orange - Secondary */
+    --color-tangerine: #E07A3E;
+    --color-tangerine-light: #E89A6A;
+    --color-tangerine-dark: #C6622A;
+    
+    /* Override primary/secondary to use our custom colors */
+    --color-primary: #3D5A80;
+    --color-secondary: #E07A3E;
+    --color-accent: #E89A6A;
+    --color-info: #5B7BA3;
+    --color-warning: #E07A3E;
+}
+
+/* Dark theme customization */
+[data-theme="dark"] {
+    --color-base-100: #1e1e2d;
+    --color-base-200: #1a1a28;
+    --color-base-300: #151521;
+    --color-base-content: #e4e4e7;
+}
+
+/* Sidebar custom styles */
+.sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+}
+
+/* Menu active state */
+.menu-active {
+    background: color-mix(in oklab, var(--color-primary) 15%, transparent) !important;
+    color: var(--color-primary) !important;
+    font-weight: 500;
+}
+
+.menu-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--color-primary);
+    border-radius: 0 3px 3px 0;
+}
+
+/* Sidebar menu items */
+.sidebar .menu li > a {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.sidebar .menu li > a:hover:not(.menu-active) {
+    background: color-mix(in oklab, var(--color-base-content) 5%, transparent);
+}
+
+/* Card hover effects */
+.card {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+}
+
+/* Table zebra pattern for dark mode */
+[data-theme="dark"] .table-zebra tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Badge soft variants */
+.badge-soft {
+    background-color: color-mix(in oklab, currentColor 15%, transparent);
+    border: none;
+}
+
+.badge-soft.badge-primary {
+    color: var(--color-primary);
+    background-color: color-mix(in oklab, var(--color-primary) 15%, transparent);
+}
+
+.badge-soft.badge-secondary {
+    color: var(--color-secondary);
+    background-color: color-mix(in oklab, var(--color-secondary) 15%, transparent);
+}
+
+.badge-soft.badge-info {
+    color: var(--color-info);
+    background-color: color-mix(in oklab, var(--color-info) 15%, transparent);
+}
+
+/* Indicator dot */
+.indicator-item.badge-xs {
+    min-width: 0.5rem;
+    min-height: 0.5rem;
+    padding: 0;
+}
+

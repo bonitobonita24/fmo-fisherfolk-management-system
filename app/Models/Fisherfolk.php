@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Fisherfolk extends Model
 {
@@ -69,6 +71,7 @@ class Fisherfolk extends Model
         'vendor',
         'fish_processing',
         'aquaculture',
+        'status',
     ];
 
     /**
@@ -87,6 +90,12 @@ class Fisherfolk extends Model
         'date_registered' => 'datetime',
         'date_updated' => 'datetime',
     ];
+
+    /**
+     * Status constants
+     */
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
 
     /**
      * The accessors to append to the model's array form.
@@ -207,5 +216,133 @@ class Fisherfolk extends Model
     {
         return $query->where('full_name', 'like', "%{$search}%")
                      ->orWhere('id_number', 'like', "%{$search}%");
+    }
+
+    /**
+     * Get all renewals for this fisherfolk.
+     */
+    public function renewals(): HasMany
+    {
+        return $this->hasMany(FisherfolkRenewal::class, 'fisherfolk_id', 'id_number');
+    }
+
+    /**
+     * Get status history for this fisherfolk.
+     */
+    public function statusHistory(): HasMany
+    {
+        return $this->hasMany(FisherfolkStatusHistory::class, 'fisherfolk_id', 'id_number');
+    }
+
+    /**
+     * Check if fisherfolk is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Check if fisherfolk is inactive.
+     */
+    public function isInactive(): bool
+    {
+        return $this->status === self::STATUS_INACTIVE;
+    }
+
+    /**
+     * Check if fisherfolk has renewed in a given year.
+     */
+    public function hasRenewedInYear(int $year): bool
+    {
+        return $this->renewals()->where('renewal_year', $year)->exists();
+    }
+
+    /**
+     * Get latest renewal.
+     */
+    public function getLatestRenewal()
+    {
+        return $this->renewals()->latest('renewal_date')->first();
+    }
+
+    /**
+     * Record a renewal for this fisherfolk.
+     */
+    public function recordRenewal(?int $userId = null, ?string $notes = null): FisherfolkRenewal
+    {
+        $renewal = $this->renewals()->create([
+            'renewal_date' => Carbon::now(),
+            'renewal_year' => Carbon::now()->year,
+            'notes' => $notes,
+            'processed_by' => $userId,
+        ]);
+
+        // Update status to active if inactive
+        if ($this->isInactive()) {
+            $this->updateStatus(self::STATUS_ACTIVE, FisherfolkStatusHistory::REASON_RENEWAL, $userId, $notes);
+        }
+
+        return $renewal;
+    }
+
+    /**
+     * Update status with history tracking.
+     */
+    public function updateStatus(string $newStatus, string $reason = 'manual', ?int $userId = null, ?string $notes = null): void
+    {
+        $oldStatus = $this->status;
+
+        if ($oldStatus !== $newStatus) {
+            $this->statusHistory()->create([
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'reason' => $reason,
+                'notes' => $notes,
+                'changed_by' => $userId,
+            ]);
+
+            $this->update(['status' => $newStatus]);
+        }
+    }
+
+    /**
+     * Mark as inactive.
+     */
+    public function markInactive(string $reason = 'manual', ?int $userId = null, ?string $notes = null): void
+    {
+        $this->updateStatus(self::STATUS_INACTIVE, $reason, $userId, $notes);
+    }
+
+    /**
+     * Mark as active.
+     */
+    public function markActive(string $reason = 'manual', ?int $userId = null, ?string $notes = null): void
+    {
+        $this->updateStatus(self::STATUS_ACTIVE, $reason, $userId, $notes);
+    }
+
+    /**
+     * Scope for active fisherfolk.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::STATUS_ACTIVE);
+    }
+
+    /**
+     * Scope for inactive fisherfolk.
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('status', self::STATUS_INACTIVE);
+    }
+
+    /**
+     * Scope for fisherfolk registered in a specific year.
+     */
+    public function scopeRegisteredInYear($query, int $year)
+    {
+        return $query->whereYear('date_registered', $year);
     }
 }
